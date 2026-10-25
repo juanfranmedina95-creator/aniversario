@@ -24,12 +24,10 @@
     min-height:100dvh; overflow:hidden; touch-action:manipulation;
     display:flex; align-items:center; justify-content:center; padding:16px;
   }
-  /* Corazones decorativos de fondo */
   .bg-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
   .bg-hearts span{position:absolute;bottom:-40px;opacity:.35;animation:subir linear infinite}
   @keyframes subir{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
 
-  /* Botón de sonido */
   #sound-btn{
     position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:50;
     width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
@@ -39,7 +37,6 @@
   }
   #sound-btn:active{transform:scale(.9)}
 
-  /* Tarjeta central */
   .card-main{
     position:relative;z-index:1;width:100%;max-width:420px;
     background:linear-gradient(180deg,#fffafa,var(--crema));
@@ -71,7 +68,6 @@
   @keyframes pulso{0%,100%{box-shadow:0 10px 24px rgba(123,30,58,.35),0 0 0 0 rgba(236,111,148,.6)}
                    50%{box-shadow:0 10px 24px rgba(123,30,58,.35),0 0 0 16px rgba(236,111,148,0)}}
 
-  /* Nivel 1 */
   .level-tag{display:inline-block;background:var(--rosa-claro);color:var(--vino);padding:5px 14px;border-radius:999px;font-size:.85rem;font-weight:700;margin-bottom:6px}
   .progress{font-size:.9rem;color:#8d3a55;margin-bottom:10px}
 
@@ -85,7 +81,7 @@
     will-change:transform;
   }
   .swipe-card.dragging{transition:none;cursor:grabbing}
-  .swipe-card .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem}
+  .swipe-card .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:7rem}
   .swipe-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
   .swipe-card .caption{
     position:absolute;left:0;right:0;bottom:0;padding:34px 14px 14px;
@@ -109,17 +105,16 @@
   #nope-btn{position:relative;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
   .round.like{background:linear-gradient(135deg,#ff8fb0,var(--rosa-fuerte))}
 
-  /* Toast */
+  /* Mensaje centrado en pantalla */
   #toast{
-    position:fixed;left:50%;top:18%;z-index:80;transform:translate(-50%,-10px) scale(.8);
-    background:var(--vino);color:#fff;padding:13px 22px;border-radius:20px;
-    font-weight:700;font-size:1.05rem;max-width:86vw;text-align:center;
+    position:fixed;left:50%;top:50%;z-index:80;transform:translate(-50%,-40%) scale(.8);
+    background:var(--vino);color:#fff;padding:16px 26px;border-radius:22px;
+    font-weight:700;font-size:1.2rem;max-width:86vw;text-align:center;
     box-shadow:0 12px 30px rgba(74,16,36,.45);opacity:0;pointer-events:none;
     transition:opacity .25s,transform .3s cubic-bezier(.3,1.6,.5,1);
   }
-  #toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
+  #toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
-  /* Match */
   #match{
     position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:20px;
     background:radial-gradient(circle,rgba(255,255,255,.96) 0%,rgba(255,200,218,.97) 55%,rgba(236,111,148,.98) 100%);
@@ -145,7 +140,6 @@
 
 <main class="card-main">
 
-  <!-- Bienvenida -->
   <section class="screen active" id="screen-welcome">
     <div class="big-emoji">💖</div>
     <h1>Nuestra Aventura de Aniversario 💖</h1>
@@ -153,7 +147,6 @@
     <button class="btn pulse" id="start-btn">¡Empezar Aventura! 🚀</button>
   </section>
 
-  <!-- Nivel 1 -->
   <section class="screen" id="screen-level1">
     <span class="level-tag">Nivel 1</span>
     <h2>Tinder de Comidas 🍽️</h2>
@@ -165,7 +158,6 @@
     </div>
   </section>
 
-  <!-- Nivel 2 (marcador para la Parte 2) -->
   <section class="screen" id="screen-level2">
     <div class="big-emoji">🔒</div>
     <h1>Nivel 2</h1>
@@ -173,7 +165,6 @@
   </section>
 </main>
 
-<!-- Pantalla Match -->
 <div id="match">
   <div class="box">
     <h1>¡IT'S A MATCH! 💖</h1>
@@ -184,14 +175,18 @@
 
 <script>
 /* ================== CONFIG ================== */
-const MUSIC_URL = 'musica.mp3'; // pon aquí tu canción (mismo directorio) o una URL directa
+// Se prueban en orden; usa el primero que exista en el repositorio
+const MUSIC_SOURCES = ['musica.mp3', 'musica.mp3.mp3'];
+
 const U = id => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=700&q=80`;
 
+/* Para cambiar una foto: pega su URL completa en img:'...'
+   Si img está vacío, se muestra solo el emoji grande. */
 const CARDS = [
   { title:'Filete de carne grueso y poco hecho 🥩', emoji:'🥩', img:U('1546964124-0cce460f38ef'), dislikeMsg:'Pues tú te lo pierdes' },
-  { title:'Helado de menta con chocolate 🍦🍃',     emoji:'🍦', img:U('1629385701021-fcd568a743e8'), dislikeMsg:'Con lo refrescante que es!' },
-  { title:'Dátiles 🌴',                              emoji:'🌴', img:U('1593001874117-c99c800e3eb7'), likeMsg:'Grossssss' },
-  { title:'Calabacín a la plancha 🥒',               emoji:'🥒', img:U('1587411768638-ec71f8e33b78'), likeMsg:'Ruining the meal!' },
+  { title:'Helado de menta con chocolate 🍦🍃',     emoji:'🍦', img:'', dislikeMsg:'Con lo refrescante que es!' },
+  { title:'Dátiles 🌴',                              emoji:'🌴', img:U('1629738601425-494c3d6ba3e2'), likeMsg:'Grossssss' },
+  { title:'Calabacín a la plancha 🥒',               emoji:'🥒', img:'', likeMsg:'Ruining the meal!' },
   { title:'Galletas con pepitas de chocolate 🍪',    emoji:'🍪', img:U('1499636136210-6f4ee915583e'), isMatch:true }
 ];
 
@@ -206,8 +201,8 @@ function toast(msg, ms=1900){
   const t=$('#toast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),ms);
 }
+function hideToast(){ clearTimeout(toastTimer); $('#toast').classList.remove('show'); }
 
-/* Corazones de fondo */
 (function(){
   const box=$('#bg-hearts'), em=['💗','💕','💖','🌹','💘'];
   for(let i=0;i<14;i++){
@@ -224,10 +219,10 @@ function toast(msg, ms=1900){
 /* ================== MÚSICA ================== */
 const music = (function(){
   const audio = new Audio();
-  audio.src = MUSIC_URL; audio.loop = true; audio.preload = 'auto'; audio.volume = .6;
-  let mode = 'file', playing = false, ctx, timer, step = 0;
+  audio.loop = true; audio.preload = 'auto'; audio.volume = .6;
+  let mode = 'file', ctx, timer, step = 0;
 
-  // Melodía de respaldo (si no existe musica.mp3)
+  // Melodía de respaldo si no se encuentra ningún mp3
   const notes = [261.6,329.6,392,523.3,392,329.6, 293.7,349.2,440,587.3,440,349.2,
                  220,261.6,329.6,440,329.6,261.6, 246.9,311.1,392,493.9,392,311.1];
   function tone(freq,t,dur){
@@ -243,34 +238,35 @@ const music = (function(){
     ctx.resume();
     if(timer) return;
     timer=setInterval(()=>{ tone(notes[step%notes.length], ctx.currentTime, 1.4); step++; }, 520);
-    playing = true;
   }
-  audio.addEventListener('error', ()=>{ if(playing && mode==='file') startSynth(); });
 
   return {
     async start(){
-      playing = true;
-      try{ await audio.play(); }catch(e){ startSynth(); }
-      update();
+      for(const s of MUSIC_SOURCES){
+        audio.src = s;
+        try{ await audio.play(); mode='file'; refreshIcon(); return; }
+        catch(e){ if(e.name==='NotAllowedError') break; }
+      }
+      startSynth(); refreshIcon();
     },
     toggle(){
       if(mode==='file'){
-        if(audio.paused){ audio.play().catch(startSynth); playing=true; } else { audio.pause(); playing=false; }
-      } else {
-        if(ctx.state==='running'){ ctx.suspend(); playing=false; } else { ctx.resume(); playing=true; }
+        if(audio.paused){ audio.play().catch(()=>{}); } else { audio.pause(); }
+      } else if(ctx){
+        if(ctx.state==='running'){ ctx.suspend(); } else { ctx.resume(); }
       }
-      update();
+      refreshIcon();
     },
     isOn(){ return mode==='file' ? !audio.paused : (ctx && ctx.state==='running'); }
   };
 })();
 const soundBtn = $('#sound-btn');
-function update(){ setTimeout(()=>{ soundBtn.textContent = music.isOn() ? '🔊' : '🔇'; },80); }
+function refreshIcon(){ setTimeout(()=>{ soundBtn.textContent = music.isOn() ? '🔊' : '🔇'; },100); }
 soundBtn.addEventListener('click', ()=>music.toggle());
 
 /* ================== BIENVENIDA ================== */
 $('#start-btn').addEventListener('click', ()=>{
-  music.start();                 // el clic del usuario desbloquea el audio
+  music.start();                 // el clic desbloquea el audio
   soundBtn.style.display='flex';
   showScreen('screen-level1');
   initLevel1();
@@ -287,7 +283,7 @@ function initLevel1(){
     const el = document.createElement('div');
     el.className='swipe-card'; el.dataset.i=realIndex;
     el.innerHTML = `<div class="fallback">${c.emoji}</div>
-      <img src="${c.img}" alt="" draggable="false" onerror="this.remove()">
+      ${c.img ? `<img src="${c.img}" alt="" draggable="false" onerror="this.remove()">` : ''}
       <div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div>
       <div class="caption">${c.title}</div>`;
     stack.appendChild(el);
@@ -297,9 +293,8 @@ function initLevel1(){
 function updateProgress(){ $('#progress').textContent = `Tarjeta ${Math.min(idx+1,CARDS.length)} de ${CARDS.length}`; }
 
 function layoutStack(){
-  const cards=[...stack.children].filter(c=>!c.classList.contains('gone')).reverse(); // [top,...]
+  const cards=[...stack.children].filter(c=>!c.classList.contains('gone')).reverse();
   cards.forEach((c,k)=>{
-    if(k>2){ c.style.opacity=0; }
     c.style.zIndex = 10-k;
     if(!c.classList.contains('dragging') && k>0){
       c.style.transform=`scale(${1-k*.05}) translateY(${k*12}px)`;
@@ -310,7 +305,6 @@ function layoutStack(){
 }
 const topCard = ()=>[...stack.children].filter(c=>!c.classList.contains('gone')).pop();
 
-/* Arrastre */
 function attachDrag(el){
   if(el._drag) return; el._drag=true;
   let sx=0, sy=0, dx=0, dragging=false;
@@ -329,15 +323,15 @@ function attachDrag(el){
   const end=()=>{
     if(!dragging) return; dragging=false; el.classList.remove('dragging');
     likeS.style.opacity=0; nopeS.style.opacity=0;
-    if(dx>100) decide('right',true);
-    else if(dx<-100) decide('left',true);
+    if(dx>100) decide('right');
+    else if(dx<-100) decide('left');
     else el.style.transform='';
   };
   el.addEventListener('pointerup',end);
   el.addEventListener('pointercancel',end);
 }
 
-function decide(dir, fromDrag=false){
+function decide(dir){
   if(busy) return;
   const card=CARDS[idx], el=topCard(); if(!el) return;
 
@@ -363,7 +357,7 @@ function decide(dir, fromDrag=false){
 nopeBtn.addEventListener('click',()=>decide('left'));
 likeBtn.addEventListener('click',()=>decide('right'));
 
-/* Botón que huye (solo en la tarjeta del match) */
+/* Botón ❌ que huye (solo en la tarjeta del match) */
 let ox=0, oy=0;
 function dodge(){
   const r=nopeBtn.getBoundingClientRect();
@@ -399,12 +393,12 @@ function confetti(n=70){
   }
 }
 function showMatch(){
-  toast('', 1); $('#match').classList.add('show');
+  hideToast(); $('#match').classList.add('show');
   confetti(80); setTimeout(()=>confetti(50),1200);
 }
 $('#next-level-btn').addEventListener('click',()=>{
   $('#match').classList.remove('show');
-  showScreen('screen-level2');   // AQUÍ se enganchará el Nivel 2 en la Parte 2
+  showScreen('screen-level2');   // aquí se enganchará el Nivel 2 en la Parte 2
 });
 </script>
 </body>
