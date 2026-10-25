@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Nuestra Aventura de Aniversario 💖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rosa-claro:#ffe3ea; --rosa:#f7a8be; --rosa-fuerte:#ec6f94;
+    --vino:#7b1e3a; --vino-oscuro:#4a1024; --crema:#fff7f4;
+    --sombra:0 14px 40px rgba(123,30,58,.25);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Playfair Display',Georgia,serif;
+    color:var(--vino-oscuro);
+    background:radial-gradient(circle at 20% 10%,#ffd1de 0%,transparent 45%),
+               radial-gradient(circle at 85% 90%,#e8809f 0%,transparent 45%),
+               linear-gradient(160deg,#ffe3ea,#f3a6bd 55%,#b9475f);
+    background-attachment:fixed;
+    min-height:100dvh; overflow:hidden; touch-action:manipulation;
+    display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  /* Corazones decorativos de fondo */
+  .bg-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .bg-hearts span{position:absolute;bottom:-40px;opacity:.35;animation:subir linear infinite}
+  @keyframes subir{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+
+  /* Botón de sonido */
+  #sound-btn{
+    position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:50;
+    width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.85);box-shadow:0 6px 18px rgba(123,30,58,.3);
+    font-size:22px;display:none;align-items:center;justify-content:center;
+    backdrop-filter:blur(6px);transition:transform .15s;
+  }
+  #sound-btn:active{transform:scale(.9)}
+
+  /* Tarjeta central */
+  .card-main{
+    position:relative;z-index:1;width:100%;max-width:420px;
+    background:linear-gradient(180deg,#fffafa,var(--crema));
+    border-radius:32px;box-shadow:var(--sombra);
+    padding:26px 20px 24px;text-align:center;
+    animation:flotar 5s ease-in-out infinite;
+    border:2px solid rgba(255,255,255,.7);
+  }
+  @keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+  .screen{display:none;animation:aparecer .5s ease}
+  .screen.active{display:block}
+  @keyframes aparecer{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+
+  h1{font-family:'Dancing Script',cursive;font-size:clamp(2.2rem,10vw,3rem);color:var(--vino);line-height:1.1;margin:8px 0 14px}
+  h2{font-family:'Dancing Script',cursive;font-size:2rem;color:var(--vino)}
+  .sub{font-style:italic;font-size:1.05rem;color:#8d3a55;margin-bottom:24px;line-height:1.4}
+  .big-emoji{font-size:3.4rem;animation:latido 1.4s infinite}
+  @keyframes latido{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+
+  .btn{
+    font-family:inherit;font-weight:700;font-size:1.1rem;cursor:pointer;border:none;
+    padding:15px 28px;border-radius:999px;color:#fff;
+    background:linear-gradient(135deg,var(--rosa-fuerte),var(--vino));
+    box-shadow:0 10px 24px rgba(123,30,58,.35);transition:transform .15s,box-shadow .15s;
+  }
+  .btn:active{transform:scale(.95)}
+  .btn.pulse{animation:pulso 1.8s infinite}
+  @keyframes pulso{0%,100%{box-shadow:0 10px 24px rgba(123,30,58,.35),0 0 0 0 rgba(236,111,148,.6)}
+                   50%{box-shadow:0 10px 24px rgba(123,30,58,.35),0 0 0 16px rgba(236,111,148,0)}}
+
+  /* Nivel 1 */
+  .level-tag{display:inline-block;background:var(--rosa-claro);color:var(--vino);padding:5px 14px;border-radius:999px;font-size:.85rem;font-weight:700;margin-bottom:6px}
+  .progress{font-size:.9rem;color:#8d3a55;margin-bottom:10px}
+
+  .stack{position:relative;width:100%;aspect-ratio:3/3.6;max-height:52dvh;margin:0 auto 14px}
+  .swipe-card{
+    position:absolute;inset:0;border-radius:26px;overflow:hidden;
+    background:linear-gradient(135deg,#ffd9e3,#f7a8be);
+    box-shadow:0 12px 28px rgba(74,16,36,.28);
+    touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;
+    transition:transform .35s cubic-bezier(.2,.8,.3,1),opacity .35s;
+    will-change:transform;
+  }
+  .swipe-card.dragging{transition:none;cursor:grabbing}
+  .swipe-card .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem}
+  .swipe-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+  .swipe-card .caption{
+    position:absolute;left:0;right:0;bottom:0;padding:34px 14px 14px;
+    background:linear-gradient(transparent,rgba(74,16,36,.88));
+    color:#fff;font-size:1.25rem;font-weight:700;text-align:left;
+  }
+  .stamp{
+    position:absolute;top:22px;padding:4px 12px;border:4px solid;border-radius:12px;
+    font-weight:700;font-size:1.6rem;opacity:0;transform:rotate(-12deg);background:rgba(255,255,255,.85)
+  }
+  .stamp.like{left:16px;color:#e0245e;border-color:#e0245e}
+  .stamp.nope{right:16px;color:#555;border-color:#555;transform:rotate(12deg)}
+
+  .actions{display:flex;justify-content:center;gap:34px;height:76px;align-items:center;position:relative}
+  .round{
+    width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;font-size:30px;
+    background:#fff;box-shadow:0 8px 20px rgba(123,30,58,.25);
+    transition:transform .15s;display:flex;align-items:center;justify-content:center;
+  }
+  .round:active{transform:scale(.88)}
+  #nope-btn{position:relative;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+  .round.like{background:linear-gradient(135deg,#ff8fb0,var(--rosa-fuerte))}
+
+  /* Toast */
+  #toast{
+    position:fixed;left:50%;top:18%;z-index:80;transform:translate(-50%,-10px) scale(.8);
+    background:var(--vino);color:#fff;padding:13px 22px;border-radius:20px;
+    font-weight:700;font-size:1.05rem;max-width:86vw;text-align:center;
+    box-shadow:0 12px 30px rgba(74,16,36,.45);opacity:0;pointer-events:none;
+    transition:opacity .25s,transform .3s cubic-bezier(.3,1.6,.5,1);
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
+
+  /* Match */
+  #match{
+    position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:20px;
+    background:radial-gradient(circle,rgba(255,255,255,.96) 0%,rgba(255,200,218,.97) 55%,rgba(236,111,148,.98) 100%);
+    text-align:center;
+  }
+  #match.show{display:flex;animation:aparecer .5s ease}
+  #match .box{max-width:420px}
+  #match h1{font-size:clamp(2.4rem,12vw,3.6rem);color:var(--vino);text-shadow:0 0 18px #fff,0 0 36px #ff9fbe;animation:brillo 1.5s infinite alternate}
+  @keyframes brillo{from{text-shadow:0 0 10px #fff,0 0 20px #ff9fbe}to{text-shadow:0 0 22px #fff,0 0 50px #ff5c8a}}
+  #match p{font-size:1.25rem;margin:14px 0 26px;font-weight:700;color:var(--vino-oscuro)}
+
+  .heart-fall{position:fixed;top:-30px;z-index:90;pointer-events:none;animation:caer linear forwards}
+  @keyframes caer{to{transform:translateY(110vh) rotate(var(--rot));opacity:.9}}
+
+  @media (max-height:640px){.stack{max-height:44dvh}.card-main{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="bg-hearts" id="bg-hearts"></div>
+<button id="sound-btn" aria-label="Activar o pausar sonido">🔊</button>
+<div id="toast"></div>
+
+<main class="card-main">
+
+  <!-- Bienvenida -->
+  <section class="screen active" id="screen-welcome">
+    <div class="big-emoji">💖</div>
+    <h1>Nuestra Aventura de Aniversario 💖</h1>
+    <p class="sub">¡Supera las pruebas para desbloquear tu sorpresa final!</p>
+    <button class="btn pulse" id="start-btn">¡Empezar Aventura! 🚀</button>
+  </section>
+
+  <!-- Nivel 1 -->
+  <section class="screen" id="screen-level1">
+    <span class="level-tag">Nivel 1</span>
+    <h2>Tinder de Comidas 🍽️</h2>
+    <div class="progress" id="progress"></div>
+    <div class="stack" id="stack"></div>
+    <div class="actions">
+      <button class="round" id="nope-btn" aria-label="Nope">❌</button>
+      <button class="round like" id="like-btn" aria-label="Like">❤️</button>
+    </div>
+  </section>
+
+  <!-- Nivel 2 (marcador para la Parte 2) -->
+  <section class="screen" id="screen-level2">
+    <div class="big-emoji">🔒</div>
+    <h1>Nivel 2</h1>
+    <p class="sub">Próximamente… 💌</p>
+  </section>
+</main>
+
+<!-- Pantalla Match -->
+<div id="match">
+  <div class="box">
+    <h1>¡IT'S A MATCH! 💖</h1>
+    <p>Por fin una gochada que nos gusta a los dos</p>
+    <button class="btn pulse" id="next-level-btn">Continuar al Nivel 2 ➡️</button>
+  </div>
+</div>
+
+<script>
+/* ================== CONFIG ================== */
+const MUSIC_URL = 'musica.mp3'; // pon aquí tu canción (mismo directorio) o una URL directa
+const U = id => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=700&q=80`;
+
+const CARDS = [
+  { title:'Filete de carne grueso y poco hecho 🥩', emoji:'🥩', img:U('1546964124-0cce460f38ef'), dislikeMsg:'Pues tú te lo pierdes' },
+  { title:'Helado de menta con chocolate 🍦🍃',     emoji:'🍦', img:U('1629385701021-fcd568a743e8'), dislikeMsg:'Con lo refrescante que es!' },
+  { title:'Dátiles 🌴',                              emoji:'🌴', img:U('1593001874117-c99c800e3eb7'), likeMsg:'Grossssss' },
+  { title:'Calabacín a la plancha 🥒',               emoji:'🥒', img:U('1587411768638-ec71f8e33b78'), likeMsg:'Ruining the meal!' },
+  { title:'Galletas con pepitas de chocolate 🍪',    emoji:'🍪', img:U('1499636136210-6f4ee915583e'), isMatch:true }
+];
+
+/* ================== UTILIDADES ================== */
+const $ = s => document.querySelector(s);
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('#'+id).classList.add('active');
+}
+let toastTimer;
+function toast(msg, ms=1900){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+/* Corazones de fondo */
+(function(){
+  const box=$('#bg-hearts'), em=['💗','💕','💖','🌹','💘'];
+  for(let i=0;i<14;i++){
+    const s=document.createElement('span');
+    s.textContent=em[i%em.length];
+    s.style.left=Math.random()*100+'%';
+    s.style.fontSize=(16+Math.random()*26)+'px';
+    s.style.animationDuration=(9+Math.random()*10)+'s';
+    s.style.animationDelay=(-Math.random()*14)+'s';
+    box.appendChild(s);
+  }
+})();
+
+/* ================== MÚSICA ================== */
+const music = (function(){
+  const audio = new Audio();
+  audio.src = MUSIC_URL; audio.loop = true; audio.preload = 'auto'; audio.volume = .6;
+  let mode = 'file', playing = false, ctx, timer, step = 0;
+
+  // Melodía de respaldo (si no existe musica.mp3)
+  const notes = [261.6,329.6,392,523.3,392,329.6, 293.7,349.2,440,587.3,440,349.2,
+                 220,261.6,329.6,440,329.6,261.6, 246.9,311.1,392,493.9,392,311.1];
+  function tone(freq,t,dur){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.12,t+.05);
+    g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+dur);
+  }
+  function startSynth(){
+    mode='synth';
+    ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+    ctx.resume();
+    if(timer) return;
+    timer=setInterval(()=>{ tone(notes[step%notes.length], ctx.currentTime, 1.4); step++; }, 520);
+    playing = true;
+  }
+  audio.addEventListener('error', ()=>{ if(playing && mode==='file') startSynth(); });
+
+  return {
+    async start(){
+      playing = true;
+      try{ await audio.play(); }catch(e){ startSynth(); }
+      update();
+    },
+    toggle(){
+      if(mode==='file'){
+        if(audio.paused){ audio.play().catch(startSynth); playing=true; } else { audio.pause(); playing=false; }
+      } else {
+        if(ctx.state==='running'){ ctx.suspend(); playing=false; } else { ctx.resume(); playing=true; }
+      }
+      update();
+    },
+    isOn(){ return mode==='file' ? !audio.paused : (ctx && ctx.state==='running'); }
+  };
+})();
+const soundBtn = $('#sound-btn');
+function update(){ setTimeout(()=>{ soundBtn.textContent = music.isOn() ? '🔊' : '🔇'; },80); }
+soundBtn.addEventListener('click', ()=>music.toggle());
+
+/* ================== BIENVENIDA ================== */
+$('#start-btn').addEventListener('click', ()=>{
+  music.start();                 // el clic del usuario desbloquea el audio
+  soundBtn.style.display='flex';
+  showScreen('screen-level1');
+  initLevel1();
+});
+
+/* ================== NIVEL 1 ================== */
+let idx = 0, busy = false;
+const stack = $('#stack'), nopeBtn = $('#nope-btn'), likeBtn = $('#like-btn');
+
+function initLevel1(){
+  idx = 0; busy = false; stack.innerHTML='';
+  CARDS.slice().reverse().forEach((c,i)=>{
+    const realIndex = CARDS.length-1-i;
+    const el = document.createElement('div');
+    el.className='swipe-card'; el.dataset.i=realIndex;
+    el.innerHTML = `<div class="fallback">${c.emoji}</div>
+      <img src="${c.img}" alt="" draggable="false" onerror="this.remove()">
+      <div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div>
+      <div class="caption">${c.title}</div>`;
+    stack.appendChild(el);
+  });
+  layoutStack(); updateProgress();
+}
+function updateProgress(){ $('#progress').textContent = `Tarjeta ${Math.min(idx+1,CARDS.length)} de ${CARDS.length}`; }
+
+function layoutStack(){
+  const cards=[...stack.children].filter(c=>!c.classList.contains('gone')).reverse(); // [top,...]
+  cards.forEach((c,k)=>{
+    if(k>2){ c.style.opacity=0; }
+    c.style.zIndex = 10-k;
+    if(!c.classList.contains('dragging') && k>0){
+      c.style.transform=`scale(${1-k*.05}) translateY(${k*12}px)`;
+      c.style.opacity = k>2?0:1;
+    }
+  });
+  if(cards[0]){ cards[0].style.transform=''; cards[0].style.opacity=1; attachDrag(cards[0]); }
+}
+const topCard = ()=>[...stack.children].filter(c=>!c.classList.contains('gone')).pop();
+
+/* Arrastre */
+function attachDrag(el){
+  if(el._drag) return; el._drag=true;
+  let sx=0, sy=0, dx=0, dragging=false;
+  const likeS=el.querySelector('.stamp.like'), nopeS=el.querySelector('.stamp.nope');
+  el.addEventListener('pointerdown',e=>{
+    if(busy) return; dragging=true; sx=e.clientX; sy=e.clientY; dx=0;
+    el.classList.add('dragging'); el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    dx=e.clientX-sx; const dy=(e.clientY-sy)*.3;
+    el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;
+    likeS.style.opacity=Math.max(0,Math.min(1,dx/100));
+    nopeS.style.opacity=Math.max(0,Math.min(1,-dx/100));
+  });
+  const end=()=>{
+    if(!dragging) return; dragging=false; el.classList.remove('dragging');
+    likeS.style.opacity=0; nopeS.style.opacity=0;
+    if(dx>100) decide('right',true);
+    else if(dx<-100) decide('left',true);
+    else el.style.transform='';
+  };
+  el.addEventListener('pointerup',end);
+  el.addEventListener('pointercancel',end);
+}
+
+function decide(dir, fromDrag=false){
+  if(busy) return;
+  const card=CARDS[idx], el=topCard(); if(!el) return;
+
+  // Última tarjeta: no se puede rechazar
+  if(card.isMatch && dir==='left'){
+    el.style.transform=''; dodge(); toast('Guapiii no te autoengañes'); return;
+  }
+
+  busy=true;
+  const out = dir==='right' ? 1 : -1;
+  el.style.transform=`translate(${out*window.innerWidth}px,-40px) rotate(${out*30}deg)`;
+  el.style.opacity=0; el.classList.add('gone');
+
+  if(dir==='left' && card.dislikeMsg) toast(card.dislikeMsg);
+  if(dir==='right' && card.likeMsg)  toast(card.likeMsg);
+
+  setTimeout(()=>{
+    el.remove(); idx++; busy=false; updateProgress(); layoutStack();
+    if(card.isMatch && dir==='right') showMatch();
+  }, 350);
+}
+
+nopeBtn.addEventListener('click',()=>decide('left'));
+likeBtn.addEventListener('click',()=>decide('right'));
+
+/* Botón que huye (solo en la tarjeta del match) */
+let ox=0, oy=0;
+function dodge(){
+  const r=nopeBtn.getBoundingClientRect();
+  const baseL=r.left-ox, baseT=r.top-oy;
+  let nx=(Math.random()<.5?-1:1)*(70+Math.random()*90);
+  let ny=(Math.random()-.6)*150;
+  const newL=Math.max(10,Math.min(window.innerWidth-r.width-10,baseL+nx));
+  const newT=Math.max(70,Math.min(window.innerHeight-r.height-10,baseT+ny));
+  ox=newL-baseL; oy=newT-baseT;
+  nopeBtn.style.transform=`translate(${ox}px,${oy}px) rotate(${Math.random()*40-20}deg)`;
+}
+['pointerenter','pointerdown','touchstart'].forEach(ev=>{
+  nopeBtn.addEventListener(ev,e=>{
+    if(idx===CARDS.length-1 && !busy){
+      e.preventDefault(); dodge(); toast('Guapiii no te autoengañes');
+    }
+  },{passive:false});
+});
+
+/* ================== MATCH + CONFETI ================== */
+function confetti(n=70){
+  const em=['💖','💗','💕','❤️','💘','🌹'];
+  for(let i=0;i<n;i++){
+    const h=document.createElement('div');
+    h.className='heart-fall'; h.textContent=em[Math.floor(Math.random()*em.length)];
+    h.style.left=Math.random()*100+'vw';
+    h.style.fontSize=(18+Math.random()*28)+'px';
+    h.style.setProperty('--rot',(Math.random()*720-360)+'deg');
+    h.style.animationDuration=(2.2+Math.random()*2.6)+'s';
+    h.style.animationDelay=(Math.random()*.9)+'s';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6500);
+  }
+}
+function showMatch(){
+  toast('', 1); $('#match').classList.add('show');
+  confetti(80); setTimeout(()=>confetti(50),1200);
+}
+$('#next-level-btn').addEventListener('click',()=>{
+  $('#match').classList.remove('show');
+  showScreen('screen-level2');   // AQUÍ se enganchará el Nivel 2 en la Parte 2
+});
+</script>
+</body>
+</html>
