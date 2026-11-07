@@ -590,14 +590,14 @@ const Music = (() => {
     el.className = 'card';
     el.innerHTML = `
       <div class="card-img" style="background:${food.bg}">
-        ${food.svg ? food.svg : <span class="food-emoji${food.tint ? ' tint' : ''}">${food.emoji}</span>}
+        ${food.svg ? food.svg : `<span class="food-emoji${food.tint ? ' tint' : ''}">${food.emoji}</span>`}
         <div class="stamp like">LIKE</div><div class="stamp nope">NOPE</div>
       </div>
       <div class="card-info">
         <h3>${food.name} <span>· ${food.sub}</span></h3>
         <p class="dist">📍 A ${1 + Math.floor(Math.random() * 9)} km de ti · activo ahora</p>
         <p class="bio">${food.bio}</p>
-        <div class="tags">${food.tags.map(t => <span>${t}</span>).join('')}</div>
+        <div class="tags">${food.tags.map(t => `<span>${t}</span>`).join('')}</div>
       </div>`;
     return el;
   }
@@ -690,7 +690,7 @@ const Music = (() => {
       if (!active) return;
       dx = e.clientX - sx;
       if (dodging && dx < 0) dx = Math.max(dx, -40); // la galleta no se deja rechazar
-      card.style.transform = translateX(${dx}px) rotate(${dx / 18}deg);
+      card.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
       like.style.opacity = Math.max(0, Math.min(1, dx / 90));
       nope.style.opacity = Math.max(0, Math.min(1, -dx / 90));
     });
@@ -721,7 +721,7 @@ const Music = (() => {
 
   function renderDots() {
     $('#qDots').innerHTML = QUESTIONS.map((_, i) =>
-      <i class="${results[i] === true ? 'ok' : results[i] === false ? 'ko' : i === qi ? 'cur' : ''}"></i>).join('');
+      `<i class="${results[i] === true ? 'ok' : results[i] === false ? 'ko' : i === qi ? 'cur' : ''}"></i>`).join('');
   }
 
   function nextQuestion() {
@@ -735,7 +735,7 @@ const Music = (() => {
       const b = document.createElement('button');
       b.className = 'opt';
       b.dataset.c = c;
-      b.innerHTML = <span class="flag">${FLAGS[c]}</span>${c};
+      b.innerHTML = `<span class="flag">${FLAGS[c]}</span>${c}`;
       b.addEventListener('click', () => answer(c));
       $('#qOpts').appendChild(b);
     });
@@ -770,7 +770,7 @@ const Music = (() => {
     if (choice === null) toast('⏰ ¡Tiempo!', 1000, 'small');
     renderDots();
     await sleep(600);
-    $('#qExplainText').innerHTML = <b>${FLAGS[correct]} ${correct}</b><br>${QUESTIONS[qi].e};
+    $('#qExplainText').innerHTML = `<b>${FLAGS[correct]} ${correct}</b><br>${QUESTIONS[qi].e}`;
     $('#qNext').textContent = qi === QUESTIONS.length - 1 ? 'Ver resultado →' : 'Siguiente →';
     $('#qExplain').classList.remove('hidden');
     $('#qExplain').scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -781,10 +781,10 @@ const Music = (() => {
   function quizEnd() {
     const pass = score >= QUIZ_MIN;
     $('#qResEmoji').textContent = pass ? (score === 5 ? '🏆' : '🎉') : '🙈';
-    $('#qResTitle').textContent = ${score} / ${QUESTIONS.length};
+    $('#qResTitle').textContent = `${score} / ${QUESTIONS.length}`;
     $('#qResText').innerHTML = pass
       ? (score === 5 ? '¡Pleno! Eres una crack viajera 🌍' : '¡Muy bien! Has superado el nivel 2')
-      : Necesitas al menos <b>${QUIZ_MIN}</b> aciertos.<br>¡Seguro que a la próxima lo bordas! 💪;
+      : `Necesitas al menos <b>${QUIZ_MIN}</b> aciertos.<br>¡Seguro que a la próxima lo bordas! 💪`;
     const btn = $('#qResBtn');
     btn.textContent = pass ? 'Siguiente nivel →' : 'Repetir quiz ↻';
     btn.onclick = pass ? startWordle : startQuiz;
@@ -906,7 +906,7 @@ const Music = (() => {
     burst(60);
     setTimeout(() => burst(40), 1500);
     $('#stops').innerHTML = STOPS.map(s =>
-      <li class="step" id="stop${s.n}"><div class="step-time">${s.time}</div><div><b>${['Primera', 'Segunda', 'Tercera'][s.n - 1]} parada: ${s.place}</b><br>${s.text}<br><span class="how">🚶‍♀️ a pie · 🚗 Cabify si lo pides</span></div></li>
+      `<li class="step" id="stop${s.n}"><div class="step-time">${s.time}</div><div><b>${['Primera', 'Segunda', 'Tercera'][s.n - 1]} parada: ${s.place}</b><br>${s.text}<br><span class="how">🚶‍♀️ a pie · 🚗 Cabify si lo pides</span></div></li>`
     ).join('');
   }
 
@@ -941,7 +941,7 @@ const Music = (() => {
     walker.style.opacity = 0;
 
     const reach = i => {
-      document.querySelector(.ipin[data-n="${i + 1}"]).classList.add('on');
+      document.querySelector(`.ipin[data-n="${i + 1}"]`).classList.add('on');
       $('#stop' + (i + 1)).classList.add('on');
       Music.sfx('pin');
     };
